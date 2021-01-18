@@ -1,0 +1,47 @@
+def Force_t(t):
+    F = 0
+    for p_ind in range(Particule_Nbr):
+        f = force_BIS(Relative_dist_arrays_X, Relative_dist_arrays_Y, t , p_ind)
+        F += np.sqrt( f[0]**2 + f[1]**2)
+    return F  
+    
+    
+    #calculating f bar
+F_bar_list = [0]*steps 
+for t in trange(steps):
+    F_bar_list[t] = Force_t( t)
+F_bar = np.mean(F_bar_list)
+
+
+
+
+def C_tau(tau, F_bar):
+    M = steps - tau -1
+    m = np.linspace(0,M, int(M/40))
+    m = [int(m[i]) for i in range (len(m))]
+    sum_value = 0
+    for i in trange(len(m)):
+        m_value = m[i]
+        sum_value += (Force_t(m_value) - F_bar) * (Force_t(m_value+tau) - F_bar)
+    sum_value = sum_value / len(m)
+    return sum_value
+    
+    
+    
+    
+    #C_list = [0]*5000
+time_list = list(np.linspace(0,200,200)) #+ [0]*(5000-200)
+C_list2 = []#*(5000-200)
+
+count = 0
+for tau in trange(200, 5000):
+    if tau%20==0:
+        count += 1
+        C_list2 += [C_tau(tau, F_bar)]
+        time_list += [tau]
+    
+    
+    
+    
+    np.savez('save_Ctau02.npz', C_list2)
+    
